@@ -8,6 +8,8 @@ namespace Resources.Endpoint.Resources.Domain.Services
         void AddResource(Guid id, string resourceName, Guid userId);
 
         void CancelResource(Guid id, Guid userId);
+
+        bool IsResourceAvailable(Guid id);
     }
 
     public class ResourceManagementService : IResourceManagementService
@@ -33,6 +35,11 @@ namespace Resources.Endpoint.Resources.Domain.Services
             resourceToCancel.Cancel(userId);
 
             DbContext.SaveChanges();
+        }
+
+        public bool IsResourceAvailable(Guid id)
+        {
+            return DbContext.Resources.Where(r => r.Id == id && !r.Canceled).Any();
         }
     }
 }

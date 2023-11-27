@@ -1,3 +1,4 @@
+using Resources.Endpoint.Availabaility.Domain.Configuration;
 using Resources.Endpoint.ProcessManagers;
 using Resources.Endpoint.Resources.Domain.Configuration;
 using Users.Client.Abstract;
@@ -16,11 +17,18 @@ namespace Resources.Endpoint
             builder.Services.AddControllers();
 
             builder.Services.ConfigureResourcesDomain(builder.Configuration.GetValue<string>("ConnectionString"));
-            
+
+            builder.Services.AddScoped<IResourceManagementProcessManager, ResourceManagementProcessManager>();
+
+            builder.Services.ConfigureAvailabilityDomain(
+                builder.Configuration.GetValue<string>("ConnectionString"),
+                builder.Configuration.GetValue<int>("TemporaryBlockadeTimeInMinutes")
+            );
+
+            builder.Services.AddScoped<IResourceBlockadeProcessManager, ResourceBlockadeProcessManager>();
 
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddHttpClient<IUserService, UserService>(client => client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("UsersEndpointUrl")));
-
 
             var app = builder.Build();
 

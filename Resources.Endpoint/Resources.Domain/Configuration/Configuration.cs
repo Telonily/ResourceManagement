@@ -11,7 +11,6 @@ namespace Resources.Endpoint.Resources.Domain.Configuration
             services.AddScoped<IResourcesDbContext, ResourcesDbContext>();
             services.Configure<ResourcesDbContextOptions>(o => o.ConnectionString = connectionString);
             services.AddScoped<IResourceManagementService, ResourceManagementService>();
-            services.AddScoped<IResourceManagementProcessManager, ResourceManagementProcessManager>();
         }
     }
 }

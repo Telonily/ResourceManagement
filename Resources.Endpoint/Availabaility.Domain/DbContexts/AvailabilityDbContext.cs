@@ -1,0 +1,103 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Resources.Endpoint.Availabaility.Domain.Models;
+using Resources.Endpoint.Availabaility.Domain.Models.Exceptions;
+
+namespace Resources.Endpoint.Availabaility.Domain.DbContexts
+{
+    public class AvailabilityDbContextOptions
+    {
+        public required string ConnectionString { get; set; }
+        public int TemporaryBlockadeInMinutes { get; set; } = 60;
+    }
+
+    public interface IAvailabilityDbContext
+    {
+        public DbSet<ResourceBlockade> ResourceBlockades { get; set; }
+
+        int SaveChanges();
+        void CreateBlockade(Guid resourceId, Guid ownerId);
+        void CreatePermanentBlockade(Guid resourceId, Guid ownerId);
+        void ReleaseBlockade(Guid resourceId, Guid ownerId);
+    }
+
+    public class AvailabilityDbContext : DbContext, IAvailabilityDbContext
+    {
+        private readonly AvailabilityDbContextOptions Options;
+
+        public AvailabilityDbContext(IOptions<AvailabilityDbContextOptions> options)
+        {
+            Options = options.Value;
+        }
+
+        public DbSet<ResourceBlockade> ResourceBlockades { get; set; }
+
+        public void CreateBlockade(Guid resourceId, Guid ownerId)
+        {
+            CheckIfActiveBlockade(resourceId);
+
+            ResourceBlockade newBlockade = new()
+            {
+                Id = Guid.NewGuid(),
+                BlockadeDate = DateTime.Now,
+                BlockadeDuration = TimeSpan.FromMinutes(Options.TemporaryBlockadeInMinutes),
+                BlockadeOwnerId = ownerId,
+                ResourceId = resourceId
+            };
+
+            ResourceBlockades.Add(newBlockade);
+            SaveChanges();
+        }
+
+        public void CreatePermanentBlockade(Guid resourceId, Guid ownerId)
+        {
+            CheckIfActiveBlockade(resourceId);
+
+            ResourceBlockade newBlockade = new()
+            {
+                Id = Guid.NewGuid(),
+                BlockadeDate = DateTime.Now,
+                BlockadeDuration = TimeSpan.Zero,
+                BlockadeOwnerId = ownerId,
+                ResourceId = resourceId
+            };
+
+            ResourceBlockades.Add(newBlockade);
+            SaveChanges();
+        }
+
+        public void ReleaseBlockade(Guid resourceId, Guid ownerId)
+        {
+            var blockade = ResourceBlockades.Where(b => b.ResourceId == resourceId && b.BlockadeOwnerId == ownerId && !b.ReleasedOnPurpose)
+                .ToList()
+                .Where(b => b.BlockadeDuration == TimeSpan.Zero || b.BlockadeDate.Add(b.BlockadeDuration) > DateTime.Now)
+                .FirstOrDefault() ?? 
+                    throw new ResourceCannotBeUnlockedException();
+
+            blockade.Release();
+            SaveChanges();
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(Options.ConnectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasDefaultSchema("Availability");
+            base.OnModelCreating(modelBuilder);
+        }
+
+
+        private void CheckIfActiveBlockade(Guid resourceId)
+        {
+            var activeResourceBlokades = ResourceBlockades
+                .Where(b => b.ResourceId == resourceId && !b.ReleasedOnPurpose)
+                .ToList();
+
+            if (activeResourceBlokades.Any(b => b.BlockadeDuration == TimeSpan.Zero || b.BlockadeDate.Add(b.BlockadeDuration) > DateTime.Now))
+                throw new ResourceAlreadyLockedException();
+        }
+    }
+}
