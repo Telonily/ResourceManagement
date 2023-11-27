@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Resources.Endpoint.InputModels;
+using Resources.Endpoint.Models.Exceptions;
+using Resources.Endpoint.ProcessManagers;
 using Resources.Endpoint.Resources.Domain.Models.Exceptions;
 using Resources.Endpoint.Resources.Domain.Services;
 
@@ -9,27 +11,45 @@ namespace Resources.Endpoint.Controllers
     [Route("api/[controller]")]
     public class ResourcesController : ControllerBase
     {
-        private readonly IResourceManagementService ResourceManagementService;
+        private readonly IResourceManagementProcessManager ResourceManagementProcessManager;
 
-        public ResourcesController(IResourceManagementService resourceManagementService)
+        public ResourcesController(IResourceManagementProcessManager resourceManagementProcessManager)
         {
-            ResourceManagementService = resourceManagementService;
+            ResourceManagementProcessManager = resourceManagementProcessManager;
         }
 
         [HttpPost("AddResource")]
         public IActionResult AddResource([FromBody] AddResourceInput input)
         {
-            ResourceManagementService.AddResource(input.Id, input.Name);
+            // TODO: Rozważyć wpięcie Middleware do konwertacji wyjątków na komunikaty
+            try
+            {
+                ResourceManagementProcessManager.AddResource(input.Id, input.Name, input.UserId, input.UserToken);
+            }
+            catch (AccessDenied ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch
+            {
+                //TODO Dodanie loggera
+                return Problem("Wystąpił błąd podczas wykonywania akcji");
+            }
+
             return Ok();
         }
 
         [HttpPost("CancelResource")]
         public IActionResult CancelResource([FromBody] CancelResourceInput input)
         {
-            // TODO: Rozważyć wpięcie Middleware do konwertacji wyjątków na komunikaty
+            
             try
             {
-                ResourceManagementService.CancelResource(input.ResourceId, input.CancelerUserId);
+                ResourceManagementProcessManager.CancelResource(input.ResourceId, input.UserId, input.UserToken);
+            }
+            catch (AccessDenied ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (ResourceNotFoundException ex)
             {

@@ -5,7 +5,7 @@ namespace Resources.Endpoint.Resources.Domain.Services
 {
     public interface IResourceManagementService
     {
-        void AddResource(Guid id, string resourceName);
+        void AddResource(Guid id, string resourceName, Guid userId);
 
         void CancelResource(Guid id, Guid userId);
     }
@@ -19,9 +19,9 @@ namespace Resources.Endpoint.Resources.Domain.Services
             DbContext = dbContext;
         }
 
-        public void AddResource(Guid id, string resourceName)
+        public void AddResource(Guid id, string resourceName, Guid userId)
         {
-            DbContext.Resources.Add(new Models.Resource { Id = id, Name = resourceName });
+            DbContext.Resources.Add(new Models.Resource { Id = id, Name = resourceName, CreatorUserId = userId });
             DbContext.SaveChanges();
         }
 

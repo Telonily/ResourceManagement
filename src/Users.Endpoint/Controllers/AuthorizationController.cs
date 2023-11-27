@@ -18,7 +18,7 @@ namespace Users.Endpoint.Controllers
         [HttpPost("AuthorizeUser")]
         public ActionResult<bool> AuthorizeUser([FromBody] AuthorizeUserInput authorizeUserInput)
         {
-            return Ok(UserService.Authorize(authorizeUserInput.UserLogin, authorizeUserInput.UserToken, authorizeUserInput.RequestedPermission));
+            return Ok(UserService.Authorize(authorizeUserInput.UserId, authorizeUserInput.UserToken, authorizeUserInput.RequestedPermission));
         }
     }
 }

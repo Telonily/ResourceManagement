@@ -18,4 +18,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\src\Users.Client\Users.Client.csproj" />
+  </ItemGroup>
+
 </Project>
