@@ -32,6 +32,20 @@ namespace Resources.Endpoint.Availabaility.Domain.DbContexts
 
         public DbSet<ResourceBlockade> ResourceBlockades { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(Options.ConnectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasDefaultSchema("Availability");
+
+            modelBuilder.Entity<ResourceBlockade>().HasIndex(x => x.ResourceId);
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         public void CreateBlockade(Guid resourceId, Guid ownerId)
         {
             CheckIfActiveBlockade(resourceId);
@@ -77,18 +91,6 @@ namespace Resources.Endpoint.Availabaility.Domain.DbContexts
             blockade.Release();
             SaveChanges();
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(Options.ConnectionString);
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.HasDefaultSchema("Availability");
-            base.OnModelCreating(modelBuilder);
-        }
-
 
         private void CheckIfActiveBlockade(Guid resourceId)
         {
