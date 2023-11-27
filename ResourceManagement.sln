@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users.Endpoint", "src\Users
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users.Public", "src\Users.Public\Users.Public.csproj", "{E129B8E1-FA25-4738-A66D-373511B37A42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources.Endpoint", "Resources.Endpoint\Resources.Endpoint.csproj", "{66ABC694-3601-4AFF-B8ED-DDCE4C80CFE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources.Endpoint", "src\Resources.Endpoint\Resources.Endpoint.csproj", "{66ABC694-3601-4AFF-B8ED-DDCE4C80CFE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users.Client", "src\Users.Client\Users.Client.csproj", "{5082DE87-BE86-4A46-A1CD-5CB40BA5EEDA}"
 EndProject

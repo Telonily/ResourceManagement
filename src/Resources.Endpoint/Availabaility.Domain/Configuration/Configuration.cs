@@ -7,7 +7,10 @@ namespace Resources.Endpoint.Availabaility.Domain.Configuration
         public static void ConfigureAvailabilityDomain(this IServiceCollection services, string connectionString, int blockadeTimeInMinutes)
         {
             services.AddScoped<IAvailabilityDbContext, AvailabilityDbContext>();
-            services.Configure<AvailabilityDbContextOptions>(o => o.ConnectionString = connectionString);
+            services.Configure<AvailabilityDbContextOptions>(o => {
+                o.ConnectionString = connectionString;
+                o.TemporaryBlockadeInMinutes = blockadeTimeInMinutes;
+            });
         }
     }
 }
