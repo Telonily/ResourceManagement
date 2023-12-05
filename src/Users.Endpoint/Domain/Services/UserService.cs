@@ -1,65 +1,63 @@
-﻿using Users.Endpoint.Domain.Models;
-using Users.Public.Models.Enums;
-using System.Linq;
+﻿using PublishedLanguage.Enums;
+using Users.Endpoint.Domain.Models;
 
-namespace Users.Endpoint.Domain.Services
+namespace Users.Endpoint.Domain.Services;
+
+public interface IUserService
 {
-    public interface IUserService
+    bool Authorize(Guid id, string token, Permission permission);
+}
+
+public class UserService : IUserService
+{
+    public bool Authorize(Guid id, string token, Permission permission)
     {
-        bool Authorize(Guid id, string token, Permission permission);
+        return GetUsers().Where(u => u.Id.Equals(id) && u.Token.Equals(token) && u.Role.Permissions.Contains(permission)).Any();
     }
 
-    public class UserService : IUserService
+    // Docelowo baza danych
+    private ICollection<User> GetUsers()
     {
-        public bool Authorize(Guid id, string token, Permission permission)
+        Role adminRole = new Role()
         {
-            return GetUsers().Where(u => u.Id.Equals(id) && u.Token.Equals(token) && u.Role.Permissions.Contains(permission)).Any();
-        }
+            Id = Guid.NewGuid(),
+            Name = "Admin",
+            Permissions = new[] { Permission.ResourceManagement, Permission.ResourceLock }
+        };
 
-        // Docelowo baza danych
-        private ICollection<User> GetUsers()
+        Role userRole = new Role()
         {
-            Role adminRole = new Role()
+            Id = Guid.NewGuid(),
+            Name = "User",
+            Permissions = new[] { Permission.ResourceLock }
+        };
+
+
+        List<User> users = new List<User>()
+        {
+            new User()
             {
-                Id = Guid.NewGuid(),
-                Name = "Admin",
-                Permissions = new[] { Permission.ResourceManagement, Permission.ResourceLock }
-            };
-
-            Role userRole = new Role()
+                Id = Guid.Parse("e96bb66b-0732-4c2c-9359-250d51b92b67"),
+                Login = "admin1",
+                Role = adminRole,
+                Token = "123123123123"
+            },
+            new User()
             {
-                Id = Guid.NewGuid(),
-                Name = "User",
-                Permissions = new[] { Permission.ResourceLock }
-            };
-
-
-            List<User> users = new List<User>()
+                Id = Guid.Parse("274b8971-3947-456c-ac32-1526f8547c37"),
+                Login = "user1",
+                Role = userRole,
+                Token = "234234234234"
+            },
+            new User()
             {
-                new User()
-                {
-                    Id = Guid.Parse("e96bb66b-0732-4c2c-9359-250d51b92b67"),
-                    Login = "admin1",
-                    Role = adminRole,
-                    Token = "123123123123"
-                },
-                new User()
-                {
-                    Id = Guid.Parse("274b8971-3947-456c-ac32-1526f8547c37"),
-                    Login = "user1",
-                    Role = userRole,
-                    Token = "234234234234"
-                },
-                new User()
-                {
-                    Id = Guid.Parse("0b6ae747-33a7-4817-91cc-ad333e273a89"),
-                    Login = "user2",
-                    Role = userRole,
-                    Token = "345345345345"
-                }
-            };
+                Id = Guid.Parse("0b6ae747-33a7-4817-91cc-ad333e273a89"),
+                Login = "user2",
+                Role = userRole,
+                Token = "345345345345"
+            }
+        };
 
-            return users;
-        }
+        return users;
     }
 }

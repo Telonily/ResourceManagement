@@ -1,61 +1,55 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Resources.Endpoint.InputModels;
-using Resources.Endpoint.ProcessManagers;
+using PublishedLanguage;
+using Resources.Application.Services;
+using Resources.Endpoint.Commands;
 
-namespace Resources.Endpoint.Controllers
+namespace Resources.Endpoint.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ResourceBlockadesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ResourceBlockadesController : ControllerBase
+    private readonly IResourceBlockadeProcessManager ResourceBlockadeProcessManager;
+
+    public ResourceBlockadesController(IResourceBlockadeProcessManager resourceBlockadeProcessManager)
     {
-        private readonly IResourceBlockadeProcessManager ResourceBlockadeProcessManager;
+        ResourceBlockadeProcessManager = resourceBlockadeProcessManager;
+    }
 
-        public ResourceBlockadesController(IResourceBlockadeProcessManager resourceBlockadeProcessManager)
+    [HttpPost("LockResourceTemporary")]
+    public IActionResult LockResourceTemporary(LockResourceTemporarily command)
+    {
+        try
         {
-            ResourceBlockadeProcessManager = resourceBlockadeProcessManager;
+            ResourceBlockadeProcessManager.LockResourceTemporary(command.ResourceId, command.UserId, command.UserToken);
+            return Ok();
         }
+        catch (BusinessException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(ex.Message); }
+    }
 
-        [HttpPost("LockResourceTemporary")]
-        public IActionResult LockResourceTemporary(LockResourceInput input)
+
+    [HttpPost("LockResourcePermanently")]
+    public IActionResult LockResourcePermanently(LockResourcePermanently command)
+    {
+        try
         {
-            try
-            {
-                ResourceBlockadeProcessManager.LockResourceTemporary(input.ResourceId, input.UserId, input.UserToken);
-                return Ok();
-            }
-            catch (Availabaility.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Resources.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Exception ex) { return Problem(ex.Message); }
+            ResourceBlockadeProcessManager.LockResourcePermanently(command.ResourceId, command.UserId, command.UserToken);
+            return Ok();
         }
+        catch (BusinessException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(ex.Message); }
+    }
 
-
-        [HttpPost("LockResourcePermanently")]
-        public IActionResult LockResourcePermanently(LockResourceInput input)
+    [HttpPost("ReleaseResource")]
+    public IActionResult ReleaseResource(ReleaseResource command)
+    {
+        try
         {
-            try
-            {
-                ResourceBlockadeProcessManager.LockResourcePermanently(input.ResourceId, input.UserId, input.UserToken);
-                return Ok();
-            }
-            catch (Availabaility.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Resources.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Exception ex) { return Problem(ex.Message); }
+            ResourceBlockadeProcessManager.ReleaseResource(command.ResourceId, command.UserId, command.UserToken);
+            return Ok();
         }
-
-        [HttpPost("ReleaseResource")]
-        public IActionResult ReleaseResource(LockResourceInput input)
-        {
-            try
-            {
-                ResourceBlockadeProcessManager.ReleaseResource(input.ResourceId, input.UserId, input.UserToken);
-                return Ok();
-            }
-            catch (Availabaility.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Resources.Domain.Models.Exceptions.BusinessException ex) { return BadRequest(ex.Message); }
-            catch (Exception ex) { return Problem(ex.Message); }
-        }
+        catch (BusinessException ex) { return BadRequest(ex.Message); }
+        catch (Exception ex) { return Problem(ex.Message); }
     }
 }

@@ -2,23 +2,22 @@
 using Users.Endpoint.Domain.Services;
 using Users.Endpoint.InputModels;
 
-namespace Users.Endpoint.Controllers
+namespace Users.Endpoint.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class AuthorizationController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthorizationController : ControllerBase
+    private readonly IUserService _userService;
+
+    public AuthorizationController(IUserService userService)
     {
-        private readonly IUserService UserService;
+        _userService = userService;
+    }
 
-        public AuthorizationController(IUserService userService)
-        {
-            UserService = userService;
-        }
-
-        [HttpPost("AuthorizeUser")]
-        public ActionResult<bool> AuthorizeUser([FromBody] AuthorizeUserInput authorizeUserInput)
-        {
-            return Ok(UserService.Authorize(authorizeUserInput.UserId, authorizeUserInput.UserToken, authorizeUserInput.RequestedPermission));
-        }
+    [HttpPost("AuthorizeUser")]
+    public ActionResult<bool> AuthorizeUser([FromBody] AuthorizeUserInput authorizeUserInput)
+    {
+        return Ok(_userService.Authorize(authorizeUserInput.UserId, authorizeUserInput.UserToken, authorizeUserInput.RequestedPermission));
     }
 }

@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -19,6 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PublishedLanguage\PublishedLanguage.csproj" />
+    <ProjectReference Include="..\Resources.Infrastructure\Resources.Infrastructure.csproj" />
     <ProjectReference Include="..\Users.Client\Users.Client.csproj" />
   </ItemGroup>
 

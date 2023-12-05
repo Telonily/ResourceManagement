@@ -1,66 +1,63 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Resources.Endpoint.InputModels;
-using Resources.Endpoint.Models.Exceptions;
-using Resources.Endpoint.ProcessManagers;
-using Resources.Endpoint.Resources.Domain.Models.Exceptions;
-using Resources.Endpoint.Resources.Domain.Services;
+using Resources.Application.Exceptions;
+using Resources.Application.Services;
+using Resources.Endpoint.Commands;
 
-namespace Resources.Endpoint.Controllers
+namespace Resources.Endpoint.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ResourcesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ResourcesController : ControllerBase
+    private readonly IResourceManagementProcessManager ResourceManagementProcessManager;
+
+    public ResourcesController(IResourceManagementProcessManager resourceManagementProcessManager)
     {
-        private readonly IResourceManagementProcessManager ResourceManagementProcessManager;
+        ResourceManagementProcessManager = resourceManagementProcessManager;
+    }
 
-        public ResourcesController(IResourceManagementProcessManager resourceManagementProcessManager)
+    [HttpPost("AddResource")]
+    public IActionResult AddResource([FromBody] AddResource command)
+    {
+        // TODO: Rozważyć wpięcie Middleware do konwertacji wyjątków na komunikaty
+        try
         {
-            ResourceManagementProcessManager = resourceManagementProcessManager;
+            ResourceManagementProcessManager.AddResource(command.Id, command.Name, command.UserId, command.UserToken);
+        }
+        catch (AccessDenied ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch
+        {
+            //TODO Dodanie loggera
+            return Problem("Wystąpił błąd podczas wykonywania akcji");
         }
 
-        [HttpPost("AddResource")]
-        public IActionResult AddResource([FromBody] AddResourceInput input)
-        {
-            // TODO: Rozważyć wpięcie Middleware do konwertacji wyjątków na komunikaty
-            try
-            {
-                ResourceManagementProcessManager.AddResource(input.Id, input.Name, input.UserId, input.UserToken);
-            }
-            catch (AccessDenied ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch
-            {
-                //TODO Dodanie loggera
-                return Problem("Wystąpił błąd podczas wykonywania akcji");
-            }
+        return Ok();
+    }
 
-            return Ok();
+    [HttpPost("CancelResource")]
+    public IActionResult CancelResource([FromBody] CancelResource command)
+    {
+
+        try
+        {
+            ResourceManagementProcessManager.CancelResource(command.ResourceId, command.UserId, command.UserToken);
+        }
+        catch (AccessDenied ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (ResourceNotFoundException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch
+        {
+            return Problem("Wystąpił błąd podczas wykonywania akcji");
         }
 
-        [HttpPost("CancelResource")]
-        public IActionResult CancelResource([FromBody] CancelResourceInput input)
-        {
-            
-            try
-            {
-                ResourceManagementProcessManager.CancelResource(input.ResourceId, input.UserId, input.UserToken);
-            }
-            catch (AccessDenied ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (ResourceNotFoundException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch
-            { 
-                return Problem("Wystąpił błąd podczas wykonywania akcji"); 
-            }
-
-            return Ok();
-        }
+        return Ok();
     }
 }
