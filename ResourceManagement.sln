@@ -17,9 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources.Application", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8C96685E-0B28-4243-B92F-0A0E6B4FDCA4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DCC864AF-BD4F-4BD7-B90A-C6264CB23175}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources.Infrastructure", "src\Resources.Infrastructure\Resources.Infrastructure.csproj", "{4248016B-038C-4EB9-BAB9-70D9DD41505A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources.Infrastructure", "src\Resources.Infrastructure\Resources.Infrastructure.csproj", "{4248016B-038C-4EB9-BAB9-70D9DD41505A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

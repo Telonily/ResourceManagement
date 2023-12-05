@@ -1,4 +1,5 @@
-﻿using Resources.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Resources.Core.Entities;
 using Resources.Core.Repositories;
 using Resources.Core.ValueObjects;
 
@@ -12,29 +13,30 @@ internal sealed class SqlServerResourceBlockadesRepository : IResourceBlockadesR
         _context = context;
     }
 
-    public ResourceBlockade Get(ResourceBlockadeId id)
-        => _context.ResourceBlockades.SingleOrDefault(x => x.Id == id);
+    public Task<ResourceBlockade> GetAsync(ResourceBlockadeId id)
+        => _context.ResourceBlockades.SingleOrDefaultAsync(x => x.Id == id);
 
 
-    public void Add(ResourceBlockade resourceBlockade)
+    public async Task AddAsync(ResourceBlockade resourceBlockade)
     {
-        _context.Add(resourceBlockade);
-        _context.SaveChanges();
+        await _context.AddAsync(resourceBlockade);
+        await _context.SaveChangesAsync();
     }
 
-    public IEnumerable<ResourceBlockade> GetAll()
-        => _context.ResourceBlockades.ToList();
+    public async Task<IEnumerable<ResourceBlockade>> GetAllAsync()
+        => await _context.ResourceBlockades.ToListAsync();
 
 
-    public void Update(ResourceBlockade resourceBlockade)
+
+    public async Task UpdateAsync(ResourceBlockade resourceBlockade)
     {
         _context.Update(resourceBlockade);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void Delete(ResourceBlockade resourceBlockade)
+    public async Task DeleteAsync(ResourceBlockade resourceBlockade)
     {
         _context.Remove(resourceBlockade);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }

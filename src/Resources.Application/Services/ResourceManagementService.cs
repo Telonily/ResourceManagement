@@ -7,11 +7,11 @@ namespace Resources.Application.Services;
 
 public interface IResourceManagementService
 {
-    void AddResource(ResourceId id, string resourceName, Guid userId);
+    Task AddResourceAsync(ResourceId id, string resourceName, Guid userId);
 
-    void CancelResource(ResourceId id, Guid userId);
+    Task CancelResourceAsync(ResourceId id, Guid userId);
 
-    bool IsResourceAvailable(ResourceId id);
+    Task<bool> IsResourceAvailableAsync(ResourceId id);
 }
 
 public class ResourceManagementService : IResourceManagementService
@@ -23,23 +23,27 @@ public class ResourceManagementService : IResourceManagementService
         _repository = dbContext;
     }
 
-    public void AddResource(ResourceId id, string resourceName, Guid userId)
+    public async Task AddResourceAsync(ResourceId id, string resourceName, Guid userId)
     {
-        _repository.Add(new Resource(id, resourceName, userId));
+        await _repository.AddAsync(new Resource(id, resourceName, userId));
     }
 
-    public void CancelResource(ResourceId id, Guid userId)
+    public async Task CancelResourceAsync(ResourceId id, Guid userId)
     {
-        var resourceToCancel = _repository.GetAll().Where(x => x.Id == id).FirstOrDefault() ??
+        var resources = await _repository.GetAllAsync();
+
+        var resourceToCancel = resources
+            .Where(x => x.Id == id).FirstOrDefault() ??
             throw new ResourceNotFoundException(id);
 
         resourceToCancel.Cancel(userId);
 
-        _repository.Update(resourceToCancel);
+        await _repository.UpdateAsync(resourceToCancel);
     }
 
-    public bool IsResourceAvailable(ResourceId id)
+    public async Task<bool> IsResourceAvailableAsync(ResourceId id)
     {
-        return _repository.GetAll().Where(r => r.Id == id && !r.Canceled).Any();
+        var resources = await _repository.GetAllAsync();
+        return resources.Where(r => r.Id == id && !r.Canceled).Any();
     }
 }

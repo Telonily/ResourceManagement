@@ -4,9 +4,9 @@ using Resources.Core.ValueObjects;
 namespace Resources.Core.Repositories;
 public interface IResourceRepository
 {
-    Resource Get(ResourceId id);
-    IEnumerable<Resource> GetAll();
-    void Add(Resource resource);
-    void Update(Resource resource);
-    void Delete(Resource resource);
+    Task<Resource> GetAsync(ResourceId id);
+    Task<IEnumerable<Resource>> GetAllAsync();
+    Task AddAsync(Resource resource);
+    Task UpdateAsync(Resource resource);
+    Task DeleteAsync(Resource resource);
 }

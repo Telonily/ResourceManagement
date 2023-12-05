@@ -1,4 +1,5 @@
-﻿using Resources.Core.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Resources.Core.Entities;
 using Resources.Core.Repositories;
 using Resources.Core.ValueObjects;
 
@@ -12,27 +13,27 @@ internal sealed class SqlServerResourceRepository : IResourceRepository
         _context = context;
     }
 
-    public Resource Get(ResourceId id)
-        => _context.Resources.SingleOrDefault(x => x.Id == id);
+    public Task<Resource> GetAsync(ResourceId id)
+        => _context.Resources.SingleOrDefaultAsync(x => x.Id == id);
 
-    public IEnumerable<Resource> GetAll()
-        => _context.Resources.ToList();
+    public async Task<IEnumerable<Resource>> GetAllAsync()
+        => await _context.Resources.ToListAsync();
 
-    public void Add(Resource resource)
+    public async Task AddAsync(Resource resource)
     {
-        _context.Add(resource);
-        _context.SaveChanges();
+        await _context.AddAsync(resource);
+        await _context.SaveChangesAsync();
     }
 
-    public void Update(Resource resource)
+    public async Task UpdateAsync(Resource resource)
     {
         _context.Update(resource);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void Delete(Resource resource)
+    public async Task DeleteAsync(Resource resource)
     {
         _context.Remove(resource);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }

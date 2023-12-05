@@ -12,11 +12,11 @@ namespace Resources.Application.Services;
 
 public interface IResourceBlockadeProcessManager
 {
-    void LockResourceTemporary(ResourceId resourceId, Guid userId, string userToken);
+    Task LockResourceTemporaryAsync(ResourceId resourceId, Guid userId, string userToken);
 
-    void LockResourcePermanently(ResourceId resourceId, Guid userId, string userToken);
+    Task LockResourcePermanentlyAsync(ResourceId resourceId, Guid userId, string userToken);
 
-    void ReleaseResource(ResourceId resourceId, Guid userId, string userToken);
+    Task ReleaseResourceAsync(ResourceId resourceId, Guid userId, string userToken);
 }
 
 public class ResourceBlockadeProcessManager : IResourceBlockadeProcessManager
@@ -35,34 +35,36 @@ public class ResourceBlockadeProcessManager : IResourceBlockadeProcessManager
     }
 
 
-    public void LockResourcePermanently(ResourceId resourceId, Guid userId, string userToken)
+    public Task LockResourcePermanentlyAsync(ResourceId resourceId, Guid userId, string userToken)
     {
         if (!_userService.AuthorizeUser(new AuthorizeUserInput { UserId = userId, UserToken = userToken, RequestedPermission = Permission.ResourceLock }))
             throw new AccessDenied();
 
         lock (GetResourceLockObject(resourceId))
         {
-            if (!_resourceManagementService.IsResourceAvailable(resourceId))
+            if (!_resourceManagementService.IsResourceAvailableAsync(resourceId).ConfigureAwait(false).GetAwaiter().GetResult())
                 throw new ResourceNotAvailableToLockException();
 
-            CheckIfActiveBlockade(resourceId);
+            CheckIfActiveBlockade(resourceId).ConfigureAwait(false).GetAwaiter().GetResult();
 
             ResourceBlockade newBlockade = new(Guid.NewGuid(), resourceId, userId, DateTime.Now, TimeSpan.Zero);
-            _resourceBlockadesRepository.Add(newBlockade);
+            _resourceBlockadesRepository.AddAsync(newBlockade);
         }
+
+        return Task.CompletedTask;
     }
 
-    public void LockResourceTemporary(ResourceId resourceId, Guid userId, string userToken)
+    public async Task LockResourceTemporaryAsync(ResourceId resourceId, Guid userId, string userToken)
     {
         if (!_userService.AuthorizeUser(new AuthorizeUserInput { UserId = userId, UserToken = userToken, RequestedPermission = Permission.ResourceLock }))
             throw new AccessDenied();
 
         lock (GetResourceLockObject(resourceId))
         {
-            if (!_resourceManagementService.IsResourceAvailable(resourceId))
+            if (!_resourceManagementService.IsResourceAvailableAsync(resourceId).ConfigureAwait(false).GetAwaiter().GetResult())
                 throw new ResourceNotAvailableToLockException();
 
-            CheckIfActiveBlockade(resourceId);
+            CheckIfActiveBlockade(resourceId).ConfigureAwait(false).GetAwaiter().GetResult(); ;
 
             ResourceBlockade newBlockade = new
             (
@@ -73,26 +75,30 @@ public class ResourceBlockadeProcessManager : IResourceBlockadeProcessManager
                 TimeSpan.FromMinutes(60) //todo
             );
 
-            _resourceBlockadesRepository.Add(newBlockade);
+            _resourceBlockadesRepository.AddAsync(newBlockade);
         }
     }
 
-    public void ReleaseResource(ResourceId resourceId, Guid userId, string userToken)
+    public Task ReleaseResourceAsync(ResourceId resourceId, Guid userId, string userToken)
     {
         if (!_userService.AuthorizeUser(new AuthorizeUserInput { UserId = userId, UserToken = userToken, RequestedPermission = Permission.ResourceLock }))
             throw new AccessDenied();
 
         lock (GetResourceLockObject(resourceId))
         {
-            var blockade = _resourceBlockadesRepository.GetAll().Where(b => b.ResourceId == resourceId && b.BlockadeOwnerId == userId && !b.ReleasedOnPurpose)
-                .ToList()
-                .Where(b => b.BlockadeDuration == TimeSpan.Zero || b.BlockadeDate.Add(b.BlockadeDuration) > DateTime.Now)
-                .FirstOrDefault() ??
-                    throw new ResourceCannotBeUnlockedException();
+            var blockades = _resourceBlockadesRepository.GetAllAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            var blockade = blockades.Where(b => b.ResourceId == resourceId && b.BlockadeOwnerId == userId && !b.ReleasedOnPurpose)
+            .ToList()
+            .Where(b => b.BlockadeDuration == TimeSpan.Zero || b.BlockadeDate.Add(b.BlockadeDuration) > DateTime.Now)
+            .FirstOrDefault() ??
+                throw new ResourceCannotBeUnlockedException();
 
             blockade.Release();
-            _resourceBlockadesRepository.Update(blockade);
+            _resourceBlockadesRepository.UpdateAsync(blockade).ConfigureAwait(false).GetAwaiter().GetResult();
         }
+
+        return Task.CompletedTask;
     }
 
     private object GetResourceLockObject(Guid resourceId)
@@ -100,10 +106,11 @@ public class ResourceBlockadeProcessManager : IResourceBlockadeProcessManager
         return ResourceLocks.GetOrAdd(resourceId, new object { });
     }
 
-    private void CheckIfActiveBlockade(ResourceId resourceId)
+    private async Task CheckIfActiveBlockade(ResourceId resourceId)
     {
-        var activeResourceBlokades = _resourceBlockadesRepository
-            .GetAll()
+        var blokades = await _resourceBlockadesRepository.GetAllAsync();
+
+        var activeResourceBlokades = blokades
             .Where(b => b.ResourceId == resourceId && !b.ReleasedOnPurpose)
             .ToList();
 

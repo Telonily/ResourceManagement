@@ -17,11 +17,11 @@ public class ResourceBlockadesController : ControllerBase
     }
 
     [HttpPost("LockResourceTemporary")]
-    public IActionResult LockResourceTemporary(LockResourceTemporarily command)
+    public async Task<ActionResult> LockResourceTemporary(LockResourceTemporarily command)
     {
         try
         {
-            ResourceBlockadeProcessManager.LockResourceTemporary(command.ResourceId, command.UserId, command.UserToken);
+            await ResourceBlockadeProcessManager.LockResourceTemporaryAsync(command.ResourceId, command.UserId, command.UserToken);
             return Ok();
         }
         catch (BusinessException ex) { return BadRequest(ex.Message); }
@@ -30,11 +30,11 @@ public class ResourceBlockadesController : ControllerBase
 
 
     [HttpPost("LockResourcePermanently")]
-    public IActionResult LockResourcePermanently(LockResourcePermanently command)
+    public async Task<ActionResult> LockResourcePermanently(LockResourcePermanently command)
     {
         try
         {
-            ResourceBlockadeProcessManager.LockResourcePermanently(command.ResourceId, command.UserId, command.UserToken);
+            await ResourceBlockadeProcessManager.LockResourcePermanentlyAsync(command.ResourceId, command.UserId, command.UserToken);
             return Ok();
         }
         catch (BusinessException ex) { return BadRequest(ex.Message); }
@@ -42,11 +42,11 @@ public class ResourceBlockadesController : ControllerBase
     }
 
     [HttpPost("ReleaseResource")]
-    public IActionResult ReleaseResource(ReleaseResource command)
+    public async Task<ActionResult> ReleaseResource(ReleaseResource command)
     {
         try
         {
-            ResourceBlockadeProcessManager.ReleaseResource(command.ResourceId, command.UserId, command.UserToken);
+            await ResourceBlockadeProcessManager.ReleaseResourceAsync(command.ResourceId, command.UserId, command.UserToken);
             return Ok();
         }
         catch (BusinessException ex) { return BadRequest(ex.Message); }
