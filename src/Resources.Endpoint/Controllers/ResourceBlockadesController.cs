@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PublishedLanguage;
 using Resources.Application.Services;
+using Resources.Core.Exceptions;
 using Resources.Endpoint.Commands;
 
 namespace Resources.Endpoint.Controllers;

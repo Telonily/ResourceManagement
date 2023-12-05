@@ -1,4 +1,6 @@
-﻿namespace Resources.Application.Exceptions;
+﻿using Resources.Core.Exceptions;
+
+namespace Resources.Application.Exceptions;
 
 public sealed class ResourceAlreadyLockedException : BusinessException
 {

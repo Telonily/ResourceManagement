@@ -19,13 +19,13 @@ public interface IResourceBlockadeProcessManager
 
 public class ResourceBlockadeProcessManager : IResourceBlockadeProcessManager
 {
-    private readonly IAvailabilityDbContext _availabilityDbContext;
+    private readonly IResourceBlockadesRepository _availabilityDbContext;
     private readonly IUserService _userService;
     private readonly IResourceManagementService _resourceManagementService;
 
     private static readonly ConcurrentDictionary<Guid, object> ResourceLocks = new();
 
-    public ResourceBlockadeProcessManager(IAvailabilityDbContext availabilityDbContext, IUserService userService, IResourceManagementService resourceManagementService)
+    public ResourceBlockadeProcessManager(IResourceBlockadesRepository availabilityDbContext, IUserService userService, IResourceManagementService resourceManagementService)
     {
         _availabilityDbContext = availabilityDbContext;
         _userService = userService;

@@ -8,8 +8,8 @@ public static class Extensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        services.AddScoped<IAvailabilityDbContext, AvailabilityDbContext>();
-        services.AddScoped<IResourcesDbContext, ResourcesDbContext>();
+        services.AddScoped<IResourceBlockadesRepository, AvailabilityDbContext>();
+        services.AddScoped<IResourcesRepository, ResourcesDbContext>();
         
         return services;
     }

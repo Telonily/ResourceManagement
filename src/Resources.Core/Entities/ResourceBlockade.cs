@@ -1,28 +1,38 @@
-﻿namespace Resources.Core.Entities;
+﻿using Resources.Core.ValueObjects;
+
+namespace Resources.Core.Entities;
 
 public class ResourceBlockade
 {
-    public required Guid Id { get; set; }
+    public ResourceBlokadeId Id { get; private set; }
 
-    public required Guid ResourceId { get; set; }
+    public ResourceId ResourceId { get; private set; }
 
     /// <summary>
     /// Id użytkownika
     /// </summary>
-    public required Guid BlockadeOwnerId { get; set; }
+    public Guid BlockadeOwnerId { get; private set; }
 
     /// <summary>
     /// Data zablokowania zasobu
     /// </summary>
-    public required DateTime BlockadeDate { get; set; }
+    public DateTime BlockadeDate { get; private set; }
 
     /// <summary>
     /// Okres na który jest zablokowany zasób, 0 - permanentnie
     /// </summary>
-    public required TimeSpan BlockadeDuration { get; set; }
+    public TimeSpan BlockadeDuration { get; private set; }
 
-    public bool ReleasedOnPurpose { get; set; }
+    public bool ReleasedOnPurpose { get; private set; }
 
+    public ResourceBlockade(ResourceBlokadeId id, ResourceId resourceId, Guid blockadeOwnerId, DateTime blockadeDate, TimeSpan blockadeDuration)
+    {
+        Id = id;
+        ResourceId = resourceId;
+        BlockadeOwnerId = blockadeOwnerId;
+        BlockadeDate = blockadeDate;
+        BlockadeDuration = blockadeDuration;
+    }
 
     public void Release()
     {

@@ -16,9 +16,9 @@ public interface IResourceManagementService
 
 public class ResourceManagementService : IResourceManagementService
 {
-    private readonly IResourcesDbContext _context;
+    private readonly IResourcesRepository _context;
 
-    public ResourceManagementService(IResourcesDbContext dbContext)
+    public ResourceManagementService(IResourcesRepository dbContext)
     {
         _context = dbContext;
     }

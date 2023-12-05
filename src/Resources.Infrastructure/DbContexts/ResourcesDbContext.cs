@@ -12,7 +12,7 @@ public class ResourcesDbContextOptions
 
 
 
-public class ResourcesDbContext : DbContext, IResourcesDbContext
+public class ResourcesDbContext : DbContext, IResourcesRepository
 {
     private readonly ResourcesDbContextOptions Options;
 
@@ -22,7 +22,7 @@ public class ResourcesDbContext : DbContext, IResourcesDbContext
     }
 
     public DbSet<Resource> Resources { get; set; }
-    ICollection<Resource> IResourcesDbContext.Resources { get => Resources.ToList(); set => throw new NotImplementedException(); }
+    ICollection<Resource> IResourcesRepository.Resources { get => Resources.ToList(); set => throw new NotImplementedException(); }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

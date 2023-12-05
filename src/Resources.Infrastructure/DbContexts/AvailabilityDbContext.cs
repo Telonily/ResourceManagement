@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Resources.Application.Exceptions;
 using Resources.Core.Entities;
 using Resources.Core.Repositories;
+using Resources.Core.ValueObjects;
 
 namespace Resources.Endpoint.Availabaility.Domain.DbContexts;
 
@@ -13,7 +14,7 @@ public class AvailabilityDbContextOptions
 }
 
 
-public class AvailabilityDbContext : DbContext, IAvailabilityDbContext
+public class AvailabilityDbContext : DbContext, IResourceBlockadesRepository
 {
     private readonly AvailabilityDbContextOptions Options;
 
@@ -23,7 +24,7 @@ public class AvailabilityDbContext : DbContext, IAvailabilityDbContext
     }
 
     public DbSet<ResourceBlockade> ResourceBlockades { get; set; }
-    IEnumerable<ResourceBlockade> IAvailabilityDbContext.ResourceBlockades { get => ResourceBlockades; set { } }
+    IEnumerable<ResourceBlockade> IResourceBlockadesRepository.ResourceBlockades { get => ResourceBlockades; set { } }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -39,41 +40,34 @@ public class AvailabilityDbContext : DbContext, IAvailabilityDbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    public void CreateBlockade(Guid resourceId, Guid ownerId)
+    public void CreateBlockade(ResourceId resourceId, Guid ownerId)
     {
         CheckIfActiveBlockade(resourceId);
 
-        ResourceBlockade newBlockade = new()
-        {
-            Id = Guid.NewGuid(),
-            BlockadeDate = DateTime.Now,
-            BlockadeDuration = TimeSpan.FromMinutes(Options.TemporaryBlockadeInMinutes),
-            BlockadeOwnerId = ownerId,
-            ResourceId = resourceId
-        };
+        ResourceBlockade newBlockade = new
+        (
+            Guid.NewGuid(),
+            resourceId,
+            ownerId,
+            DateTime.Now,
+            TimeSpan.FromMinutes(Options.TemporaryBlockadeInMinutes)
+        );
 
         ResourceBlockades.Add(newBlockade);
         SaveChanges();
     }
 
-    public void CreatePermanentBlockade(Guid resourceId, Guid ownerId)
+    public void CreatePermanentBlockade(ResourceId resourceId, Guid ownerId)
     {
         CheckIfActiveBlockade(resourceId);
 
-        ResourceBlockade newBlockade = new()
-        {
-            Id = Guid.NewGuid(),
-            BlockadeDate = DateTime.Now,
-            BlockadeDuration = TimeSpan.Zero,
-            BlockadeOwnerId = ownerId,
-            ResourceId = resourceId
-        };
+        ResourceBlockade newBlockade = new(Guid.NewGuid(), resourceId, ownerId, DateTime.Now, TimeSpan.Zero);
 
         ResourceBlockades.Add(newBlockade);
         SaveChanges();
     }
 
-    public void ReleaseBlockade(Guid resourceId, Guid ownerId)
+    public void ReleaseBlockade(ResourceId resourceId, Guid ownerId)
     {
         var blockade = ResourceBlockades.Where(b => b.ResourceId == resourceId && b.BlockadeOwnerId == ownerId && !b.ReleasedOnPurpose)
             .ToList()
@@ -85,7 +79,7 @@ public class AvailabilityDbContext : DbContext, IAvailabilityDbContext
         SaveChanges();
     }
 
-    private void CheckIfActiveBlockade(Guid resourceId)
+    private void CheckIfActiveBlockade(ResourceId resourceId)
     {
         var activeResourceBlokades = ResourceBlockades
             .Where(b => b.ResourceId == resourceId && !b.ReleasedOnPurpose)
