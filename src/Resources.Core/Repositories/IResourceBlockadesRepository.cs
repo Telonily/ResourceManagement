@@ -4,10 +4,9 @@ using Resources.Core.ValueObjects;
 namespace Resources.Core.Repositories;
 public interface IResourceBlockadesRepository
 {
-    public IEnumerable<ResourceBlockade> ResourceBlockades { get; set; }
-
-    int SaveChanges();
-    void CreateBlockade(ResourceId resourceId, Guid ownerId);
-    void CreatePermanentBlockade(ResourceId resourceId, Guid ownerId);
-    void ReleaseBlockade(ResourceId resourceId, Guid ownerId);
+    ResourceBlockade Get(ResourceBlockadeId id);
+    IEnumerable<ResourceBlockade> GetAll();
+    void Add(ResourceBlockade resource);
+    void Update(ResourceBlockade resource);
+    void Delete(ResourceBlockade resource);
 }

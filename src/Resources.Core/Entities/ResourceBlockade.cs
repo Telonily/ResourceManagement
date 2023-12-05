@@ -4,7 +4,7 @@ namespace Resources.Core.Entities;
 
 public class ResourceBlockade
 {
-    public ResourceBlokadeId Id { get; private set; }
+    public ResourceBlockadeId Id { get; private set; }
 
     public ResourceId ResourceId { get; private set; }
 
@@ -25,7 +25,7 @@ public class ResourceBlockade
 
     public bool ReleasedOnPurpose { get; private set; }
 
-    public ResourceBlockade(ResourceBlokadeId id, ResourceId resourceId, Guid blockadeOwnerId, DateTime blockadeDate, TimeSpan blockadeDuration)
+    public ResourceBlockade(ResourceBlockadeId id, ResourceId resourceId, Guid blockadeOwnerId, DateTime blockadeDate, TimeSpan blockadeDuration)
     {
         Id = id;
         ResourceId = resourceId;

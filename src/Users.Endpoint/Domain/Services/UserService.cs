@@ -37,21 +37,21 @@ public class UserService : IUserService
         {
             new User()
             {
-                Id = Guid.Parse("e96bb66b-0732-4c2c-9359-250d51b92b67"),
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                 Login = "admin1",
                 Role = adminRole,
                 Token = "123123123123"
             },
             new User()
             {
-                Id = Guid.Parse("274b8971-3947-456c-ac32-1526f8547c37"),
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
                 Login = "user1",
                 Role = userRole,
                 Token = "234234234234"
             },
             new User()
             {
-                Id = Guid.Parse("0b6ae747-33a7-4817-91cc-ad333e273a89"),
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000003"),
                 Login = "user2",
                 Role = userRole,
                 Token = "345345345345"

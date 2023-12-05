@@ -1,7 +1,7 @@
+using Resources.Application;
+using Resources.Infrastructure;
 using Users.Client.Abstract;
 using Users.Client.Concrete;
-using Resources.Infrastructure;
-using Resources.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 

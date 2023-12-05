@@ -16,31 +16,30 @@ public interface IResourceManagementService
 
 public class ResourceManagementService : IResourceManagementService
 {
-    private readonly IResourcesRepository _context;
+    private readonly IResourceRepository _repository;
 
-    public ResourceManagementService(IResourcesRepository dbContext)
+    public ResourceManagementService(IResourceRepository dbContext)
     {
-        _context = dbContext;
+        _repository = dbContext;
     }
 
     public void AddResource(ResourceId id, string resourceName, Guid userId)
     {
-        _context.Resources.Add(new Resource(id, resourceName, userId));
-        _context.SaveChanges();
+        _repository.Add(new Resource(id, resourceName, userId));
     }
 
     public void CancelResource(ResourceId id, Guid userId)
     {
-        var resourceToCancel = _context.Resources.Where(x => x.Id == id).FirstOrDefault() ??
+        var resourceToCancel = _repository.GetAll().Where(x => x.Id == id).FirstOrDefault() ??
             throw new ResourceNotFoundException(id);
 
         resourceToCancel.Cancel(userId);
 
-        _context.SaveChanges();
+        _repository.Update(resourceToCancel);
     }
 
     public bool IsResourceAvailable(ResourceId id)
     {
-        return _context.Resources.Where(r => r.Id == id && !r.Canceled).Any();
+        return _repository.GetAll().Where(r => r.Id == id && !r.Canceled).Any();
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Resources.Core.ValueObjects;
 
-public sealed record ResourceBlokadeId
+public sealed record ResourceBlockadeId
 {
     public Guid Value { get; }
 
-    public ResourceBlokadeId(Guid value)
+    public ResourceBlockadeId(Guid value)
     {
         if (value == Guid.Empty)
             throw new InvalidEntityIdException(value);
@@ -14,11 +14,11 @@ public sealed record ResourceBlokadeId
         Value = value;
     }
 
-    public static ResourceBlokadeId Create() => new(Guid.NewGuid());
+    public static ResourceBlockadeId Create() => new(Guid.NewGuid());
 
-    public static implicit operator Guid(ResourceBlokadeId resourceId)
+    public static implicit operator Guid(ResourceBlockadeId resourceId)
         => resourceId.Value;
 
-    public static implicit operator ResourceBlokadeId(Guid value)
+    public static implicit operator ResourceBlockadeId(Guid value)
         => new(value);
 }

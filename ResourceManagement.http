@@ -1,0 +1,67 @@
+@url = http://localhost:5001
+@resourceId = 00000000-0000-0000-0000-000000000001
+@adminUserId = 00000000-0000-0000-0000-000000000001
+@userId = 00000000-0000-0000-0000-000000000002
+
+
+
+
+###
+POST {{url}}/api/Resources/AddResource
+Content-Type: application/json
+
+{
+    "Id" : "{{resourceId}}",
+    "Name": "Zasób 1",
+    "UserId": "{{adminUserId}}",
+    "UserToken": "123123123123"
+}
+
+
+
+###
+POST {{url}}/api/Resources/CancelResource
+Content-Type: application/json
+
+{
+    "ResourceId" : "{{resourceId}}",
+    "UserId": "{{adminUserId}}",
+    "UserToken": "123123123123"
+}
+
+
+###
+POST {{url}}/api/ResourceBlockades/LockResourceTemporary
+Content-Type: application/json
+
+{
+    "ResourceId" : "{{resourceId}}",
+    "UserId": "{{userId}}",
+    "UserToken": "123123123123"
+}
+
+
+
+###
+POST {{url}}/api/ResourceBlockades/ReleaseResource
+Content-Type: application/json
+
+{
+    "ResourceId" : "{{resourceId}}",
+    "UserId": "{{userId}}",
+    "UserToken": "123123123123"
+}
+
+
+###
+POST {{url}}/api/ResourceBlockades/LockResourcePermanently
+Content-Type: application/json
+
+{
+    "ResourceId" : "{{resourceId}}",
+    "UserId": "{{userId}}",
+    "UserToken": "123123123123"
+}
+
+
+
