@@ -19,37 +19,22 @@ public class ResourceBlockadesController : ControllerBase
     [HttpPost("LockResourceTemporary")]
     public async Task<ActionResult> LockResourceTemporary(LockResourceTemporarily command)
     {
-        try
-        {
-            await ResourceBlockadeProcessManager.LockResourceTemporaryAsync(command.ResourceId, command.UserId, command.UserToken);
-            return Ok();
-        }
-        catch (BusinessException ex) { return BadRequest(ex.Message); }
-        catch (Exception ex) { return Problem(ex.Message); }
+        await ResourceBlockadeProcessManager.LockResourceTemporaryAsync(command.ResourceId, command.UserId, command.UserToken);
+        return Ok();
     }
 
 
     [HttpPost("LockResourcePermanently")]
     public async Task<ActionResult> LockResourcePermanently(LockResourcePermanently command)
     {
-        try
-        {
-            await ResourceBlockadeProcessManager.LockResourcePermanentlyAsync(command.ResourceId, command.UserId, command.UserToken);
-            return Ok();
-        }
-        catch (BusinessException ex) { return BadRequest(ex.Message); }
-        catch (Exception ex) { return Problem(ex.Message); }
+        await ResourceBlockadeProcessManager.LockResourcePermanentlyAsync(command.ResourceId, command.UserId, command.UserToken);
+        return Ok();
     }
 
     [HttpPost("ReleaseResource")]
     public async Task<ActionResult> ReleaseResource(ReleaseResource command)
     {
-        try
-        {
-            await ResourceBlockadeProcessManager.ReleaseResourceAsync(command.ResourceId, command.UserId, command.UserToken);
-            return Ok();
-        }
-        catch (BusinessException ex) { return BadRequest(ex.Message); }
-        catch (Exception ex) { return Problem(ex.Message); }
+        await ResourceBlockadeProcessManager.ReleaseResourceAsync(command.ResourceId, command.UserId, command.UserToken);
+        return Ok();
     }
 }
